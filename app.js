@@ -12,6 +12,7 @@ $(document).ready(function(){
 			url: rootUrl + endpoint,
 			success: function(response)
 			{
+				console.log(response);
 				$(".output").html("<div class='output-content'><h4>Server Response:</h4>\
 					<div class='response'>"+ response +"</div></div>");
 			},
