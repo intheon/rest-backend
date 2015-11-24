@@ -14,7 +14,7 @@ class apiHandler
 		See https://github.com/intheon/rest-backend#allowed-methods for a full list.
 		*/
 
-		$app->get("/", array($this, "readHomeRoute"));			// for the root
+		$app->get("/", array($this, "readHomeRoute"));				// for the root
 		$app->get("/user", array($this, "readAllUsers"));			// get all users
 		$app->get("/widget", array($this, "readAllWidgets")); 		// get all widgets
 		$app->get("/user/:id", array($this, "readOneUser"));		// get specific user
@@ -40,12 +40,25 @@ class apiHandler
 
 	public function readAllUsers()									// block of users
 	{
-		$db = new database();
-		$statement = $databaseHandle2->query("SELECT * FROM test");
+		$database = new medoo([
+			"database_type" => "mysql",
+			"database_name" => "api-test",
+			"server" => "localhost",
+			"username" => "root",
+			"password" => "",
+			"charset" => "utf8",
+			"option" => [
+				PDO::ATTR_CASE => PDO::CASE_NATURAL
+			]
+		]);
 
-		$statement->setFetchMode(PDO::FETCH_ASSOC);
+		$data = $database->select("test","*");
 
-		echo var_dump($statement);
+		foreach ($data as $lineItem)
+		{
+			echo $lineItem["phrase"];
+		}
+
 
 		/*
 
