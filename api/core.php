@@ -41,29 +41,29 @@ class apiHandler
 	public function readAllUsers()									// block of users
 	{
 		$db = new database();
-
-		$data = $db->connectToDB()->select("test","*");
-
-		foreach ($data as $lineItem)
-		{
-			echo "item number " . $lineItem["id"] . " ";
-			echo $lineItem["phrase"];
-			echo "<br />";
-		}
+		$data = $db->connectToDB()->select("user","*");
+		echo json_encode($data);
+		return false;
 	}
 
 	public function readAllWidgets()								// block of widgets
 	{
+
 		echo "all widgets...";
 	}
 
 	public function readOneUser($id)								// users profile
 	{
+		$db = new database();
+
+
 		echo "a specific user... " . $id;
+
 	}
 
 	public function readOneWidget($id)								// widget info
 	{
+
 		echo "a specific widget... " . $id;
 	}
 
