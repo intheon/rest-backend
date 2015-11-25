@@ -35,8 +35,9 @@ A useful tool such as a todo list, a calendar, news feed etc. All have some form
 
 The ‘link’ between a user and widget which effectively tells us what position in the app each widget should appear, and what metadata / user data to have the widget parse.
 
--	stateId – Unique Identified in DB.
--	widgetId – One widget Id.
+-	stateId – Unique Identifier from DB.
+-	userId – User in question.
+-	widgetId – Widget in question.
 -	widgetData – A block of JSON this widget should be responsible to parse.
 
 ##### Allowed Methods #####
