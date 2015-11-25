@@ -40,19 +40,9 @@ class apiHandler
 
 	public function readAllUsers()									// block of users
 	{
-		$database = new medoo([
-			"database_type" => "mysql",
-			"database_name" => "api-test",
-			"server" => "localhost",
-			"username" => "root",
-			"password" => "",
-			"charset" => "utf8",
-			"option" => [
-				PDO::ATTR_CASE => PDO::CASE_NATURAL
-			]
-		]);
+		$db = new database();
 
-		$data = $database->select("test","*");
+		$data = $db->connectToDB()->select("test","*");
 
 		foreach ($data as $lineItem)
 		{
