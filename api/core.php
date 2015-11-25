@@ -90,9 +90,9 @@ class apiHandler
 		{
 			$isPasswordCorrect = $this->checkPassword($username, $password);
 			if ($isPasswordCorrect) $this->generateAuthToken($username);
-			else if ($isPasswordCorrect == false) echo htmlspecialchars("incorrectpw");
+			else if ($isPasswordCorrect == false) $this->responseBuilder("message", "incorrectpwd");
 		}
-		else echo htmlspecialchars("nonexistent");
+		else $this->responseBuilder("message", "nonexistent");
 	}
 
 	public function updateUser()														// update existing user
@@ -166,68 +166,17 @@ class apiHandler
 				"username" => $username
 			]);
 
-		echo json_encode($credentials);
+		echo $this->responseBuilder("token", json_encode($credentials));
+	}
+
+	private function responseBuilder($messageType, $messageBody)							// a helper function to build a json response to the client
+	{
+		$response["messageType"] = $messageType;
+		$response["messageBody"] = $messageBody;
+		echo json_encode($response);
 	}
 }
 
 $api = new apiHandler();
 
-
-/*
-abstract class databaseConfig
-{
-	protected $host = "localhost";
-	protected $username = "root";
-	protected $password = "";
-	protected $database = "api-test";
-
-	public function __construct(){
-		// todo, use PDO
-		$connect = mysqli_connect(
-			$this->host, 
-			$this->username, 
-			$this->password, 
-			$this->database
-		);
-
-	}
-}
-
-class dbConnect extends databaseConfig
-{
-	public function __construct($operation)
-	{
-		switch ($operation)
-		{
-			case "getAllUsers":
-			echo var_dump($connect);
-
-
-				$this->getAllUsers($this);
-
-			break;
-			default:
-			break;
-		}
-	}
-
-	public function getAllUsers()
-	{
-
-		$data = mysqli_query($c,"SELECT * FROM test");
-
-		echo var_dump($data);
-		/*
-		$json = array();
-
-		while($row = mysqli_fetch_assoc($data))
-		{
-			$json[] =  $row;
-		}
-		echo json_encode($json);
-
-	}
-}
-
-*/
 ?>
