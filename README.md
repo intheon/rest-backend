@@ -21,7 +21,7 @@ Information about a particular user and its state.
 
 -	userId  - DatabaseId which is used to uniquely identify user.
 -	name – name of the user.
--	states – States define what widgets the user has added, and the userdata they’ve attached to each. An Object which has multiple states inside it.
+-	states – States define what widgets the user has added, and the userdata they’ve attached to each. An Object which has multiple state ids inside it.
 
 ###### Widget ######
 
