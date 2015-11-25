@@ -46,17 +46,10 @@ class apiHandler
 
 		foreach ($data as $lineItem)
 		{
+			echo "item number " . $lineItem["id"] . " ";
 			echo $lineItem["phrase"];
+			echo "<br />";
 		}
-
-
-		/*
-
-		while ($row = $statement->fetch())
-		{
-			echo $row->phrase;
-		}
-		*/
 	}
 
 	public function readAllWidgets()								// block of widgets
