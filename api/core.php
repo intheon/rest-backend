@@ -1,20 +1,42 @@
 <?php
 
 require "/vendor/autoload.php";															// loads our frameworks
+
 require "/database.php";																// loads our database handling code
+
+
+class tokenAuth extends \Slim\Middleware
+{
+	public function __construct()
+	{
+        // Get reference to application
+        $app = $this->app;
+
+        // Run inner middleware and application
+        $this->next->call();
+
+        // Capitalize response body
+        $res = $app->response;
+        $body = $res->getBody();
+        $res->setBody(strtoupper($body));
+	}
+}
+
 
 class apiHandler
 {
 	public function __construct()
 	{
 		$app = new \Slim\Slim();														// slim framework
-		$app->add(new tokenAuth());
+		$app->add(new tokenAuth())
 		/*
 		Defining all the routes below.
 		See https://github.com/intheon/rest-backend#allowed-methods for a full list.
 		*/
 
-		$app->get("/", array($this, "readHomeRoute"));								// for the root
+		$app->get("/", array($this, "readHomeRoute"));	
+
+		/*							// for the root
 		$app->get("/user", array($this, "tokenCheck"), array($this, "readAllUsers"));							// get all users
 		$app->get("/widget", array($this, "tokenCheck"), array($this, "readAllWidgets")); 						// get all widgets
 		$app->get("/user/:id", array($this, "tokenCheck"), array($this, "readOneUser"));						// get specific user
@@ -30,6 +52,7 @@ class apiHandler
 		$app->delete("/user/:id", array($this, "tokenCheck"), array($this, "deleteUser"));						// delete user
 		$app->delete("/widget/:id", array($this, "tokenCheck"), array($this, "deleteWidget"));					// delete widget
 		$app->delete("/state/:id", array($this, "tokenCheck"), array($this, "deleteState"));					// delete state
+		*/
 
 		$app->run();																	// start this mofo
 	}
@@ -41,6 +64,7 @@ class apiHandler
 
 	public function readHomeRoute()														// messages for the home screen
 	{
+
 		echo "root mofo";
 	}
 
