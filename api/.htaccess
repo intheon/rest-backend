@@ -3,3 +3,5 @@
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteRule ^ core.php [QSA,L]
 </IfModule>
+
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1

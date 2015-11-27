@@ -1,65 +1,38 @@
 <?php
 
 require "/vendor/autoload.php";															// loads our frameworks
-
 require "/database.php";																// loads our database handling code
-
-
-class tokenAuth extends \Slim\Middleware
-{
-	public function __construct()
-	{
-        // Get reference to application
-        $app = $this->app;
-
-        // Run inner middleware and application
-        $this->next->call();
-
-        // Capitalize response body
-        $res = $app->response;
-        $body = $res->getBody();
-        $res->setBody(strtoupper($body));
-	}
-}
-
+require "/tokenAuth.php";																// middleware to intercept the token
 
 class apiHandler
 {
 	public function __construct()
 	{
 		$app = new \Slim\Slim();														// slim framework
-		$app->add(new tokenAuth())
+		$app->add(new tokenAuth());
 		/*
 		Defining all the routes below.
 		See https://github.com/intheon/rest-backend#allowed-methods for a full list.
 		*/
 
-		$app->get("/", array($this, "readHomeRoute"));	
-
-		/*							// for the root
-		$app->get("/user", array($this, "tokenCheck"), array($this, "readAllUsers"));							// get all users
-		$app->get("/widget", array($this, "tokenCheck"), array($this, "readAllWidgets")); 						// get all widgets
-		$app->get("/user/:id", array($this, "tokenCheck"), array($this, "readOneUser"));						// get specific user
-		$app->get("/widget/:id", array($this, "tokenCheck"), array($this, "readOneWidget"));					// get specific widget
-		$app->get("/state/:id", array($this, "tokenCheck"), array($this, "readOneState"));						// get specific state
-		$app->post("/login/:username/:password", array($this, "tokenCheck"), array($this, "loginUser"));		// create new user
-		$app->post("/user", array($this, "tokenCheck"), array($this, "createUser"));							// create new user
-		$app->post("/widget", array($this, "tokenCheck"), array($this, "createWidget"));						// create new widget
-		$app->post("/state", array($this, "tokenCheck"), array($this, "createState"));							// create new state
-		$app->put("/user/:id", array($this, "tokenCheck"), array($this, "updateUser"));							// update user
-		$app->put("/widget/:id", array($this, "tokenCheck"), array($this, "updateWidget"));						// update widget
-		$app->put("/state/:id", array($this, "tokenCheck"), array($this, "updateState"));						// update state
-		$app->delete("/user/:id", array($this, "tokenCheck"), array($this, "deleteUser"));						// delete user
-		$app->delete("/widget/:id", array($this, "tokenCheck"), array($this, "deleteWidget"));					// delete widget
-		$app->delete("/state/:id", array($this, "tokenCheck"), array($this, "deleteState"));					// delete state
-		*/
+		$app->get("/", array($this, "readHomeRoute"));									// for the root
+		$app->get("/user", array($this, "readAllUsers"));								// get all users
+		$app->get("/widget", array($this, "readAllWidgets")); 							// get all widgets
+		$app->get("/user/:id", array($this, "readOneUser"));							// get specific user
+		$app->get("/widget/:id", array($this, "readOneWidget"));						// get specific widget
+		$app->get("/state/:id", array($this, "readOneState"));							// get specific state
+		$app->post("/login/:username/:password", array($this, "loginUser"));			// create new user
+		$app->post("/user", array($this, "createUser"));								// create new user
+		$app->post("/widget", array($this, "createWidget"));							// create new widget
+		$app->post("/state", array($this, "createState"));								// create new state
+		$app->put("/user/:id", array($this, "updateUser"));								// update user
+		$app->put("/widget/:id", array($this, "updateWidget"));							// update widget
+		$app->put("/state/:id", array($this, "updateState"));							// update state
+		$app->delete("/user/:id", array($this, "deleteUser"));							// delete user
+		$app->delete("/widget/:id", array($this, "deleteWidget"));						// delete widget
+		$app->delete("/state/:id", array($this, "deleteState"));						// delete state
 
 		$app->run();																	// start this mofo
-	}
-
-	public function tokenCheck()
-	{
-		echo "HAI!";
 	}
 
 	public function readHomeRoute()														// messages for the home screen
