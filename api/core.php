@@ -37,7 +37,6 @@ class apiHandler
 
 	public function readHomeRoute()														// messages for the home screen
 	{
-
 		echo "root mofo";
 	}
 
@@ -56,8 +55,13 @@ class apiHandler
 
 	public function readOneUser($id)													// get users profile
 	{
-		//$db = new database();
-		echo "a specific user... " . $id;
+		$states = $this->getUsersStates($id);
+		$statesArr = $this->turnStringToArray($states);
+
+		foreach ($statesArr as $int)
+		{
+			echo $int;
+		}
 	}
 
 	public function readOneWidget($id)													// get widget info
@@ -177,6 +181,31 @@ class apiHandler
 		$response["messageType"] = $messageType;
 		$response["messageBody"] = $messageBody;
 		echo json_encode($response);
+	}
+
+	private function getUsersStates($id)
+	{
+		$db = new database();
+
+		$data = $db->connectToDB()->select("auth",[
+				"[>]user" => ["id" => "f_userId"]
+			],[
+				"auth.id",
+				"auth.username",
+				"user.u_states"
+			]);
+
+		$states = $data[0]["u_states"];
+
+		return $states;
+	}
+
+	private function turnStringToArray($string)
+	{
+		$string = ltrim($string, "[");
+		$string = rtrim($string, "]");
+		$string = explode(",", $string);
+		return $string;
 	}
 }
 

@@ -2,41 +2,53 @@
 
 class tokenAuth extends \Slim\Middleware
 {
-	public function deny()
+	public function denyAccess()
 	{
-
+     	$res = $this->app->response();
+        $res->status(401);
+        echo "access denied";
 	}
 
-	public function authenticate($token)
+	public function authenticateToken($authorisation)
 	{
+		$fullToken = json_decode($authorisation);
+		$asArray = get_object_vars($fullToken);
+		$username = $asArray["username"];
+		$token = $asArray["token"];
+		$expiry = $asArray["tokenExpiration"];
+
 		$db = new database();
-		$data = $db->connectToDB()->select("user","*");
+		$data = $db->connectToDB()->select("auth", [
+				"username",
+				"token",
+				"token_expiry",
+			],[
+				"username" => $username
+			]);
+
+		// todo: add checking for token expiry
+		// right now just checks for matching token, need that extra level of security.
+
+		if ($token == $data[0]["token"])
+		{
+			$res = $this->app->response();
+       		$res->status(200);
+			$this->next->call();
+		}
+		else
+		{
+			$this->denyAccess();
+		}
 	}
 
 	public function call()
 	{       
 		$authHeader = $this->app->request->headers->get("Authorization");
 
-		if ($authHeader == "noToken")
-		{
-			$this->next->call();
-		}
-		else 
-		{
-			echo "token present";
-		}
-
-		/*
-
-		if ($authHeader === null)
-		{
-			echo "no header, proceed";
-		}
-		else
-		{
-			echo "header, wow";
-		}
-
+		if (strlen($authHeader) == 0) $this->denyAccess();
+		else if (strlen($authHeader) > 0)
+			if ($authHeader == "noToken") $this->next->call();
+			else $this->authenticateToken($authHeader);
 
         /*
         //Check if our token is valid
