@@ -77,8 +77,7 @@ class apiHandler
 
 		$merged = $this->mergeStateAndWidgetData($statesRaw, $widgetsRaw);
 
-		print_r($merged);
-
+		echo json_encode($merged);
 	}
 
 	public function readOneWidget($widgetId)													// get widget info
@@ -256,7 +255,6 @@ class apiHandler
 
 			$state
 			------
-
 			Array
 			(
 			    [0] => Array
@@ -270,13 +268,10 @@ class apiHandler
 			            [widgetId] => 2
 			            [widgetData] => this is my money calendar stuff
 			        )
-
 			)
 			-------------------------------------------------------------
-
 			$widget
-			-------
-
+			---------------
 			Array
 			(
 			    [0] => Array
@@ -287,7 +282,6 @@ class apiHandler
 			                    [w_name] => Todo
 			                    [w_pathToCode] => /widgets/Todo
 			                )
-
 			        )
 
 			    [1] => Array
@@ -298,9 +292,7 @@ class apiHandler
 			                    [w_name] => Calendar
 			                    [w_pathToCode] => /widgets/Calendar
 			                )
-
 			        )
-
 			)
 			-----------------------------------------------------------------
 
@@ -323,7 +315,6 @@ class apiHandler
 			            [w_name] => Calendar
 			            [w_pathToCode] => /widgets/Calendar
 			        )
-
 			)
 			-------------------------------------------------------------
 
