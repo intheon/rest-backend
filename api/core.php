@@ -70,17 +70,15 @@ class apiHandler
 		// the states tell us which primary keys of the widgets to go after
 		foreach ($statesRaw as $item)
 		{
-			$widgetsRaw[] = $this->readOneWidget($item[0]["widgetId"]);
+			$widgetsRaw[] = $this->readOneWidget($item["widgetId"]);
 		}
 
+		//now, we merge the two!
 
-		/*
+		$merged = $this->mergeStateAndWidgetData($statesRaw, $widgetsRaw);
 
-		foreach ($statesArr as $int)
-		{
-			echo $int;
-		}
-		*/
+		print_r($merged);
+
 	}
 
 	public function readOneWidget($widgetId)													// get widget info
@@ -88,6 +86,7 @@ class apiHandler
 		$db = new database();
 		$data = $db->connectToDB()->select("widgets", 
 			[
+				"w_id",
 				"w_name",
 				"w_pathToCode"
 			],[
@@ -108,7 +107,7 @@ class apiHandler
 				"stateId" => $stateId
 			]);
 
-		return $data;
+		return $data[0];
 	}
 
 	public function createUser()														// create a new user
@@ -248,6 +247,110 @@ class apiHandler
 		$states = $data[0]["u_states"];
 
 		return $states;
+	}
+
+	private function mergeStateAndWidgetData($state, $widget)
+	{
+		/*
+			Currently, the vars look like this:
+
+			$state
+			------
+
+			Array
+			(
+			    [0] => Array
+			        (
+			            [widgetId] => 1
+			            [widgetData] => this is some json of all my todos
+			        )
+
+			    [1] => Array
+			        (
+			            [widgetId] => 2
+			            [widgetData] => this is my money calendar stuff
+			        )
+
+			)
+			-------------------------------------------------------------
+
+			$widget
+			-------
+
+			Array
+			(
+			    [0] => Array
+			        (
+			            [0] => Array
+			                (
+			                    [w_id] => 1
+			                    [w_name] => Todo
+			                    [w_pathToCode] => /widgets/Todo
+			                )
+
+			        )
+
+			    [1] => Array
+			        (
+			            [0] => Array
+			                (
+			                    [w_id] => 2
+			                    [w_name] => Calendar
+			                    [w_pathToCode] => /widgets/Calendar
+			                )
+
+			        )
+
+			)
+			-----------------------------------------------------------------
+
+			I'm getting them to look like this:
+
+			Array
+			(
+			    [0] => Array
+			        (
+			            [widgetId] => 1
+			            [widgetData] => this is some json of all my todos
+			            [w_name] => Todo
+			            [w_pathToCode] => /widgets/Todo
+			        )
+
+			    [1] => Array
+			        (
+			            [widgetId] => 2
+			            [widgetData] => this is my money calendar stuff
+			            [w_name] => Calendar
+			            [w_pathToCode] => /widgets/Calendar
+			        )
+
+			)
+			-------------------------------------------------------------
+
+			*/
+
+		$raw = array();
+
+		foreach($widget as $individualWidget)
+		{
+			$widgetId = $individualWidget[0]["w_id"];
+			foreach ($state as $individualState)
+			{
+				if ($widgetId == $individualState["widgetId"])
+				{
+					$temp = array();
+
+					$temp["widgetId"] = $widgetId;
+					$temp["widgetName"] = $individualWidget[0]["w_name"];
+					$temp["widgetPath"] = $individualWidget[0]["w_pathToCode"];
+					$temp["widgetData"] = $individualState["widgetData"];
+
+					$raw[] = $temp;
+				}
+			}
+		}
+
+		return $raw;
 	}
 
 	private function turnStringToArray($string)
