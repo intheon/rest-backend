@@ -56,22 +56,59 @@ class apiHandler
 	public function readOneUser($id)													// get users profile
 	{
 		$states = $this->getUsersStates($id);
-		$statesArr = $this->turnStringToArray($states);
+		$statesAsArr = $this->turnStringToArray($states);
+
+		$statesRaw = array();
+		$widgetsRaw = array();
+
+		// $statesAsArr are primary keys that match existing states in the db
+		foreach ($statesAsArr as $one)
+		{
+			$statesRaw[] = $this->readOneState($one);
+		}
+
+		// the states tell us which primary keys of the widgets to go after
+		foreach ($statesRaw as $item)
+		{
+			$widgetsRaw[] = $this->readOneWidget($item[0]["widgetId"]);
+		}
+
+
+		/*
 
 		foreach ($statesArr as $int)
 		{
 			echo $int;
 		}
+		*/
 	}
 
-	public function readOneWidget($id)													// get widget info
+	public function readOneWidget($widgetId)													// get widget info
 	{
-		echo "a specific widget... " . $id;
+		$db = new database();
+		$data = $db->connectToDB()->select("widgets", 
+			[
+				"w_name",
+				"w_pathToCode"
+			],[
+				"w_Id" => $widgetId
+			]);
+
+		return $data;
 	}
 
-	public function readOneState($id)													// get specific state details
+	public function readOneState($stateId)												// get specific state details
 	{
-		echo "a specific state... " . $id;
+		$db = new database();
+		$data = $db->connectToDB()->select("states", 
+			[
+				"widgetId",
+				"widgetData"
+			],[
+				"stateId" => $stateId
+			]);
+
+		return $data;
 	}
 
 	public function createUser()														// create a new user
@@ -183,16 +220,29 @@ class apiHandler
 		echo json_encode($response);
 	}
 
-	private function getUsersStates($id)
+	private function getUsersPrimary($username)
 	{
 		$db = new database();
-
 		$data = $db->connectToDB()->select("auth",[
-				"[>]user" => ["id" => "f_userId"]
+				"id"
 			],[
-				"auth.id",
-				"auth.username",
-				"user.u_states"
+				"username" => $username
+			]);
+
+		return array_shift($data);
+	}
+
+	private function getUsersStates($id)
+	{
+		$usersPrimaryKey = $this->getUsersPrimary($id);
+		$usersPrimaryKey = array_shift($usersPrimaryKey);
+
+		$db = new database();
+
+		$data = $db->connectToDB()->select("user",[
+				"u_states"
+			],[
+				"f_id" => $usersPrimaryKey
 			]);
 
 		$states = $data[0]["u_states"];
