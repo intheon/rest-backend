@@ -23,6 +23,7 @@ class apiHandler
 		$app->get("/state/:id", array($this, "readOneState"));							// get specific state
 		$app->post("/login/:username/:password", array($this, "loginUser"));			// create new user
 		$app->post("/user", array($this, "createUser"));								// create new user
+		$app->post("/user/register", array($this, "registerUser"));						// register new user
 		$app->post("/widget", array($this, "createWidget"));							// create new widget
 		$app->post("/state", array($this, "createState"));								// create new state
 		$app->put("/user/:id", array($this, "updateUser"));								// update user
@@ -112,6 +113,53 @@ class apiHandler
 	public function createUser()														// create a new user
 	{
 		echo "user created";
+	}
+
+
+	public function registerUser()														// register a new user
+	{
+		if (isset($_POST["payload"]))
+		{
+			$payload = $_POST["payload"];
+
+			$doesUserExist = $this->checkUsernameExists($payload["usr"]);
+
+			if (!$doesUserExist)
+			{
+				$hashed = $this->hashPassword($payload["pwd"]);
+				$token = bin2hex(openssl_random_pseudo_bytes(16));
+				$token_expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+
+				$db = new database();
+				$response = $db->connectToDB()->insert("auth", [
+					"username" => $payload["usr"],
+					"password" => $hashed,
+					"name" => $payload["nm"],
+					"email" => $payload["email"],
+					"token" => $token,
+					"token_expiry" => $token_expiry
+				]);
+
+				$this->loginUser($payload["usr"], $payload["pwd"]);
+
+			}
+			else
+			{
+				$this->responseBuilder("message", "nonexistent");
+			}
+
+			/*
+			$db = new database();
+
+			$data = $db->connectToDB()->insert("auth", "username", [
+					"username" => $username,
+
+				]);
+
+			if (count($data) === 0) return false;
+			else if (count($data) === 1) return true;
+			*/
+		}
 	}
 
 	public function createWidget()														// create new widget
