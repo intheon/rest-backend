@@ -57,28 +57,38 @@ class apiHandler
 	public function readOneUser($id)													// get users profile
 	{
 		$states = $this->getUsersStates($id);
-		$statesAsArr = $this->turnStringToArray($states);
 
-		$statesRaw = array();
-		$widgetsRaw = array();
-
-		// $statesAsArr are primary keys that match existing states in the db
-		foreach ($statesAsArr as $one)
+		if (!$states)
 		{
-			$statesRaw[] = $this->readOneState($one);
+			echo "nowidgets";
+		}
+		else
+		{
+			$states = $this->getUsersStates($id);
+			$statesAsArr = $this->turnStringToArray($states);
+
+			$statesRaw = array();
+			$widgetsRaw = array();
+
+			// $statesAsArr are primary keys that match existing states in the db
+			foreach ($statesAsArr as $one)
+			{
+				$statesRaw[] = $this->readOneState($one);
+			}
+
+			// the states tell us which primary keys of the widgets to go after
+			foreach ($statesRaw as $item)
+			{
+				$widgetsRaw[] = $this->readOneWidget($item["widgetId"]);
+			}
+
+			//now, we merge the two!
+
+			$merged = $this->mergeStateAndWidgetData($statesRaw, $widgetsRaw);
+
+			echo json_encode($merged);
 		}
 
-		// the states tell us which primary keys of the widgets to go after
-		foreach ($statesRaw as $item)
-		{
-			$widgetsRaw[] = $this->readOneWidget($item["widgetId"]);
-		}
-
-		//now, we merge the two!
-
-		$merged = $this->mergeStateAndWidgetData($statesRaw, $widgetsRaw);
-
-		echo json_encode($merged);
 	}
 
 	public function readOneWidget($widgetId)													// get widget info
@@ -291,9 +301,8 @@ class apiHandler
 				"f_id" => $usersPrimaryKey
 			]);
 
-		$states = $data[0]["u_states"];
-
-		return $states;
+		if (empty($data)) return false;
+		else return $data[0]["u_states"];
 	}
 
 	private function mergeStateAndWidgetData($state, $widget)
