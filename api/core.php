@@ -51,7 +51,9 @@ class apiHandler
 
 	public function readAllWidgets()													// get block of widgets
 	{
-		echo "all widgets...";
+		$db = new database();
+		$data = $db->connectToDB()->select("widgets",["w_name", "w_pathToCode", "w_desc"]);
+		echo json_encode($data);
 	}
 
 	public function readOneUser($id)													// get users profile
