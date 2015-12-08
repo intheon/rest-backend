@@ -59,7 +59,7 @@ class apiHandler
 	public function readOneUser($id)													// get users profile
 	{
 		$states = $this->getUsersStates($id);
-
+		
 		if (!$states)
 		{
 			echo "nowidgets";
@@ -67,8 +67,18 @@ class apiHandler
 		else
 		{
 			$states = $this->getUsersStates($id);
-			$statesAsArr = $this->turnStringToArray($states);
+			//$statesAsArr = $this->turnStringToArray($states);
 
+			$widgets = array();
+			foreach ($states as $individual)
+			{
+				$widgets[] = $this->readOneWidget($individual["widgetId"]);
+			}
+
+			print_r($widgets);
+			//print_r($widgets);
+
+			/*
 			$statesRaw = array();
 			$widgetsRaw = array();
 
@@ -89,6 +99,7 @@ class apiHandler
 			$merged = $this->mergeStateAndWidgetData($statesRaw, $widgetsRaw);
 
 			echo json_encode($merged);
+			*/
 		}
 
 	}
@@ -122,6 +133,39 @@ class apiHandler
 
 		return $data[0];
 	}
+
+	private function getUsersPrimary($username)
+	{
+		$db = new database();
+		$data = $db->connectToDB()->select("auth",[
+				"id"
+			],[
+				"username" => $username
+			]);
+
+		return array_shift($data);
+	}
+
+	private function getUsersStates($id)
+	{
+		$usersPrimaryKey = $this->getUsersPrimary($id);
+		$usersPrimaryKey = array_shift($usersPrimaryKey);
+
+		$db = new database();
+
+		$data = $db->connectToDB()->select("states",[
+				"stateId",
+				"widgetId",
+				"userId",
+				"widgetData"
+			],[
+				"userId" => $usersPrimaryKey
+			]);
+
+		if (empty($data)) return false;
+		else return $data;
+	}
+
 
 	public function createUser()														// create a new user
 	{
@@ -182,7 +226,18 @@ class apiHandler
 
 	public function createState()														// create new state
 	{
-		echo "state created";
+		if (isset($_POST["payload"]))
+		{
+			$payload = $_POST["payload"];
+			$userId = $payload["userId"];
+			$widgetId = $payload["widgetId"];
+
+			$db = new database();
+			$action = $db->connectToDB()->insert("states", [
+				"userId" => $userId,
+				"widgetId" => $widgetId
+				]);
+		}
 	}
 
 	public function loginUser($username, $password)										// log user in
@@ -260,6 +315,8 @@ class apiHandler
 		$credentials["username"] = $username;
 		$credentials["token"] = bin2hex(openssl_random_pseudo_bytes(16));
 		$credentials["tokenExpiration"] = date('Y-m-d H:i:s', strtotime('+1 hour'));
+		$credentials["userId"] = $this->getUsersPrimary($username);
+		$credentials["userId"] = array_shift($credentials["userId"]);
 
 		$db = new database();
 		$data = $db->connectToDB()->update("auth", [
@@ -279,35 +336,6 @@ class apiHandler
 		echo json_encode($response);
 	}
 
-	private function getUsersPrimary($username)
-	{
-		$db = new database();
-		$data = $db->connectToDB()->select("auth",[
-				"id"
-			],[
-				"username" => $username
-			]);
-
-		return array_shift($data);
-	}
-
-	private function getUsersStates($id)
-	{
-		$usersPrimaryKey = $this->getUsersPrimary($id);
-		$usersPrimaryKey = array_shift($usersPrimaryKey);
-
-		$db = new database();
-
-		$data = $db->connectToDB()->select("user",[
-				"u_states"
-			],[
-				"f_id" => $usersPrimaryKey
-			]);
-
-		if (empty($data)) return false;
-		else return $data[0]["u_states"];
-	}
-
 	private function mergeStateAndWidgetData($state, $widget)
 	{
 		/*
@@ -319,15 +347,20 @@ class apiHandler
 			(
 			    [0] => Array
 			        (
-			            [widgetId] => 1
-			            [widgetData] => this is some json of all my todos
+			            [stateId] => 10
+			            [widgetId] => 4
+			            [userId] => 8
+			            [widgetData] => "blah"
 			        )
 
 			    [1] => Array
 			        (
-			            [widgetId] => 2
-			            [widgetData] => this is my money calendar stuff
+			            [stateId] => 11
+			            [widgetId] => 3
+			            [userId] => 8
+			            [widgetData] => "blah"
 			        )
+
 			)
 			-------------------------------------------------------------
 			$widget
@@ -338,20 +371,24 @@ class apiHandler
 			        (
 			            [0] => Array
 			                (
-			                    [w_id] => 1
-			                    [w_name] => Todo
-			                    [w_pathToCode] => /widgets/Todo
+			                    [w_id] => 4
+			                    [w_name] => Gmail Plugin
+			                    [w_codeName] => gmail
+			                    [w_pathToCode] => /Gmail
 			                )
+
 			        )
 
 			    [1] => Array
 			        (
 			            [0] => Array
 			                (
-			                    [w_id] => 2
-			                    [w_name] => Calendar
-			                    [w_pathToCode] => /widgets/Calendar
+			                    [w_id] => 3
+			                    [w_name] => News Feeds
+			                    [w_codeName] => newsfeeds
+			                    [w_pathToCode] => /News
 			                )
+
 			        )
 			)
 			-----------------------------------------------------------------
@@ -365,6 +402,7 @@ class apiHandler
 			            [widgetId] => 1
 			            [widgetData] => this is some json of all my todos
 			            [w_name] => Todo
+			            [w_codeName] => todo
 			            [w_pathToCode] => /widgets/Todo
 			        )
 
@@ -373,6 +411,7 @@ class apiHandler
 			            [widgetId] => 2
 			            [widgetData] => this is my money calendar stuff
 			            [w_name] => Calendar
+			            [w_codeName] => calendar
 			            [w_pathToCode] => /widgets/Calendar
 			        )
 			)
