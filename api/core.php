@@ -52,7 +52,7 @@ class apiHandler
 	public function readAllWidgets()													// get block of widgets
 	{
 		$db = new database();
-		$data = $db->connectToDB()->select("widgets",["w_name", "w_pathToCode", "w_desc"]);
+		$data = $db->connectToDB()->select("widgets",["w_id", "w_name", "w_codeName", "w_pathToCode", "w_desc"]);
 		echo json_encode($data);
 	}
 
@@ -100,6 +100,7 @@ class apiHandler
 			[
 				"w_id",
 				"w_name",
+				"w_codeName",
 				"w_pathToCode"
 			],[
 				"w_Id" => $widgetId
