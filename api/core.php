@@ -66,40 +66,18 @@ class apiHandler
 		}
 		else
 		{
+			// all the users states in an array
 			$states = $this->getUsersStates($id);
-			//$statesAsArr = $this->turnStringToArray($states);
 
+			// retreve all users widgets individually, and store them in an array
 			$widgets = array();
-			foreach ($states as $individual)
-			{
-				$widgets[] = $this->readOneWidget($individual["widgetId"]);
-			}
-
-			print_r($widgets);
-			//print_r($widgets);
-
-			/*
-			$statesRaw = array();
-			$widgetsRaw = array();
-
-			// $statesAsArr are primary keys that match existing states in the db
-			foreach ($statesAsArr as $one)
-			{
-				$statesRaw[] = $this->readOneState($one);
-			}
-
-			// the states tell us which primary keys of the widgets to go after
-			foreach ($statesRaw as $item)
-			{
-				$widgetsRaw[] = $this->readOneWidget($item["widgetId"]);
-			}
+			foreach ($states as $individual) $widgets[] = $this->readOneWidget($individual["widgetId"]);
 
 			//now, we merge the two!
-
-			$merged = $this->mergeStateAndWidgetData($statesRaw, $widgetsRaw);
+			$merged = $this->mergeStateAndWidgetData($states, $widgets);
 
 			echo json_encode($merged);
-			*/
+
 		}
 
 	}
@@ -332,7 +310,7 @@ class apiHandler
 	private function responseBuilder($messageType, $messageBody)							// a helper function to build a json response to the client
 	{
 		$response["messageType"] = $messageType;
-		$response["messageBody"] = $messageBody;
+		$response["messageBody"] = $messageBody; 
 		echo json_encode($response);
 	}
 
@@ -421,9 +399,10 @@ class apiHandler
 
 		$raw = array();
 
-		foreach($widget as $individualWidget)
+		foreach ($widget as $individualWidget)
 		{
 			$widgetId = $individualWidget[0]["w_id"];
+
 			foreach ($state as $individualState)
 			{
 				if ($widgetId == $individualState["widgetId"])
@@ -433,6 +412,7 @@ class apiHandler
 					$temp["widgetId"] = $widgetId;
 					$temp["widgetName"] = $individualWidget[0]["w_name"];
 					$temp["widgetPath"] = $individualWidget[0]["w_pathToCode"];
+					$temp["widgetCodeName"] = $individualWidget[0]["w_codeName"];
 					$temp["widgetData"] = $individualState["widgetData"];
 
 					$raw[] = $temp;
@@ -441,6 +421,7 @@ class apiHandler
 		}
 
 		return $raw;
+
 	}
 
 	private function turnStringToArray($string)
