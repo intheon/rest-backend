@@ -21,8 +21,7 @@ class apiHandler
 		$app->get("/user/:id", array($this, "readOneUser"));							// get specific user
 		$app->get("/widget/:id", array($this, "readOneWidget"));						// get specific widget
 		$app->get("/state/:id", array($this, "readOneState"));							// get specific state
-		$app->post("/login/:username/:password", array($this, "loginUser"));			// create new user
-		$app->post("/user", array($this, "createUser"));								// create new user
+		$app->post("/login/:username/:password", array($this, "loginUser"));			// login user
 		$app->post("/user/register", array($this, "registerUser"));						// register new user
 		$app->post("/widget", array($this, "createWidget"));							// create new widget
 		$app->post("/state", array($this, "createState"));								// create new state
@@ -38,15 +37,17 @@ class apiHandler
 
 	public function readHomeRoute()														// messages for the home screen
 	{
-		echo "root mofo";
+		echo "do the funky chicken";
 	}
 
 	public function readAllUsers()														// block of users
 	{
 		// this needs restricting to be admin only, or removing!
+		/*
 		$db = new database();
 		$data = $db->connectToDB()->select("user","*");
 		echo json_encode($data);
+		*/
 	}
 
 	public function readAllWidgets()													// get block of widgets
@@ -142,12 +143,6 @@ class apiHandler
 
 		if (empty($data)) return false;
 		else return $data;
-	}
-
-
-	public function createUser()														// create a new user
-	{
-		echo "user created";
 	}
 
 
@@ -289,7 +284,7 @@ class apiHandler
 	{
 		/*
 		see https://www.webstreaming.com.ar/articles/php-slim-token-authentication/
-		*/
+		*/ 
 		$credentials["username"] = $username;
 		$credentials["token"] = bin2hex(openssl_random_pseudo_bytes(16));
 		$credentials["tokenExpiration"] = date('Y-m-d H:i:s', strtotime('+1 hour'));
