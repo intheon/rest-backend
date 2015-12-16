@@ -44,7 +44,6 @@ The ‘link’ between a user and widget which effectively tells us what positio
 
 | Method | URI          | Action                     |
 |--------|--------------|----------------------------|
-| GET    | /api/user    | Returns list of all users. |
 | GET    | /api/user/:id | Returns specific user profile. |
 | GET    | /api/widget | Returns list of all widgets. |
 | GET    | /api/widget/:id | Returns specific widget. |
@@ -52,6 +51,8 @@ The ‘link’ between a user and widget which effectively tells us what positio
 | POST  | /api/user | Create a brand new user with a blank profile. |
 | POST  | /api/widget | Create a new widget. |
 | POST  | /api/state | Create a new state. |
+| POST  | /api/login/:username/:password | Logs the user in |
+| POST  | /api/register/ | registers a new user |
 | PUT    | /api/user/:id | Updates specific user profile. |
 | PUT    | /api/widget/:id | Updates specific widget. |
 | PUT    | /api/state/:id | Updates specific state. |
@@ -59,5 +60,9 @@ The ‘link’ between a user and widget which effectively tells us what positio
 | DELETE    | /api/widget/:id | Delete's specific widget. |
 | DELETE    | /api/state/:id | Delete's specific state. |
 
+##### Authorisation #####
 
+Each request needs to have a header called 'Authorization' in order to proceed. This contains the user name, and a token which exists for an hour when the user logs in initially. When a log in occurs, it checks the username/pwd against the db, then fires back a token and token expiry which can be saved as a cookie.
+
+This uses the Slim framework, and uses a custom middleware to intercept each request to make sure it's authorised. If not, a 401 is fired back. See tokenAuth.php and core.php for implementation.
 ##### More to come! #####
