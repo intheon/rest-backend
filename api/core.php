@@ -236,9 +236,22 @@ class apiHandler
 		echo "widget updated";
 	}
 
-	public function updateState()														// update existing state
+	public function updateState($stateId)												// update existing state
 	{
-		echo "state updated";
+		echo var_dump(file_get_contents("php://input"));
+	
+
+			/*
+		}
+		$db = new database();
+
+		$data = $db->connectToDB()->update("states", [
+				"widgetData" => $credentials["token"],
+				"token_expiry" => $credentials["tokenExpiration"]
+			],[
+				"username" => $username
+			]);
+			*/
 	}
 
 	public function deleteUser()														// delete existing user
@@ -405,6 +418,7 @@ class apiHandler
 					$temp = array();
 
 					$temp["widgetId"] = $widgetId;
+					$temp["stateId"] = $individualState["stateId"];
 					$temp["widgetName"] = $individualWidget[0]["w_name"];
 					$temp["widgetPath"] = $individualWidget[0]["w_pathToCode"];
 					$temp["widgetCodeName"] = $individualWidget[0]["w_codeName"];
