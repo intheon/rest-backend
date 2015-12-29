@@ -238,20 +238,17 @@ class apiHandler
 
 	public function updateState($stateId)												// update existing state
 	{
-		echo var_dump(file_get_contents("php://input"));
-	
+		$app = \Slim\Slim::getInstance();
 
-			/*
-		}
+		$newData = $app->request->put("payload");
+
 		$db = new database();
 
 		$data = $db->connectToDB()->update("states", [
-				"widgetData" => $credentials["token"],
-				"token_expiry" => $credentials["tokenExpiration"]
+				"widgetData" => $newData
 			],[
-				"username" => $username
+				"stateId" => $stateId
 			]);
-			*/
 	}
 
 	public function deleteUser()														// delete existing user
